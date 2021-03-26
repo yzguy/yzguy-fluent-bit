@@ -1,0 +1,27 @@
+version: '3'
+
+vars:
+  DOCKER_IMAGE: registry.yzguy.io/fluent-bit
+  GIT_COMMIT:
+    sh: git log -n 1 --format=%h
+
+tasks:
+  download-plugins:
+    vars:
+      PLUGINS: |
+        https://github.com/newrelic/newrelic-fluent-bit-output/releases/download/v1.4.6/out_newrelic-linux-amd64-1.4.6.so
+    cmds:
+      - mkdir plugins
+      - |
+        {{ range $i, $line := .PLUGINS | splitLines -}}
+        wget -P plugins/ {{ $line }}
+        {{ end }}
+    
+  build:
+    deps: [download-plugins]
+    cmds:
+      - docker build -t {{ .DOCKER_IMAGE }}:{{ .GIT_COMMIT }} .
+
+  push:
+    cmds:
+      - docker push {{ .DOCKER_IMAGE }}:{{ .GIT_COMMIT }}
