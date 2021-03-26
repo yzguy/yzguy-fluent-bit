@@ -7,15 +7,9 @@ vars:
 
 tasks:
   download-plugins:
-    vars:
-      PLUGINS: |
-        https://github.com/newrelic/newrelic-fluent-bit-output/releases/download/v1.4.6/out_newrelic-linux-amd64-1.4.6.so
     cmds:
-      - mkdir plugins
-      - |
-        {{ range $i, $line := .PLUGINS | splitLines -}}
-        wget -P plugins/ {{ $line }}
-        {{ end }}
+      - rm -rf plugins && mkdir -p plugins
+      - wget -P plugins/ https://github.com/newrelic/newrelic-fluent-bit-output/releases/download/v1.4.6/out_newrelic-linux-amd64-1.4.6.so
     
   build:
     deps: [download-plugins]
